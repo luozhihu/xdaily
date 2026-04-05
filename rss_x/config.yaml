@@ -26,6 +26,8 @@ settings:
 
 twitter:
   enabled: true
+  auth_token: "b16c2c272ddf575a50864ab0ade32abf152ac0af"      # Twitter auth_token cookie (from x.com developer tools)
+  ct0: "67fa4abf64e35b5f75f1c0b5c5e2c16650715f2f259a8d49ecca01a33b5aa4105c711eed2d4472b3c12b82a50c4d9620960395fc04644b4e0754cc703d0f88346adeea9db5d23be292b8d5eab6665b15"             # Twitter ct0 cookie
   rate_limit:
     base_delay: 2.5
     max_retries: 5
