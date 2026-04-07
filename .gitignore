@@ -26,3 +26,9 @@ Thumbs.db
 
 # Playwright
 /.playwright-mcp
+
+# Claude Code
+.claude/
+
+# Data backups
+rss_x/data/backups/
