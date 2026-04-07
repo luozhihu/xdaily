@@ -1,2 +1,28 @@
-/.playwright-mcpnode_modules/
+# Dependencies
 node_modules/
+
+# Next.js build output
+.next/
+out/
+
+# Build artifacts
+*.pyc
+__pycache__/
+*.db
+
+# Logs
+logs/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Playwright
+/.playwright-mcp
