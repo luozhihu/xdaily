@@ -74,24 +74,13 @@ export default function Home() {
   const [twitterSearchError, setTwitterSearchError] = useState('');
   const [isAddingFeed, setIsAddingFeed] = useState(false);
 
-  // Shuffle array helper
-  const shuffleArray = <T,>(array: T[]): T[] => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  };
-
-  // Generate random rotation for card stacking
+  // Fixed fan-shaped rotation for card stacking
   const getCardRotation = (index: number, total: number): number => {
-    if (index === 0) {
-      // Top card: within 20 degrees
-      return (Math.random() - 0.5) * 40; // -20 to 20
-    }
-    // Other cards: random rotation up to 45 degrees in each direction
-    return (Math.random() - 0.5) * 90; // -45 to 45
+    if (total <= 1) return 0;
+    // Fan distribution: 60 degree total range, evenly spaced
+    const maxAngle = 30; // max 30 degrees on each side
+    const angleStep = (maxAngle * 2) / Math.max(total - 1, 1);
+    return -maxAngle + index * angleStep;
   };
 
   useEffect(() => {
@@ -101,7 +90,7 @@ export default function Home() {
   }, [isLoading, isAuthenticated, router]);
 
   useEffect(() => {
-    if (isAuthenticated && mainView === 'control') {
+    if (isAuthenticated) {
       fetchCategories();
       fetchFeeds();
     }
@@ -161,7 +150,14 @@ export default function Home() {
   const handleCategorySelect = (categoryId: number) => {
     setSelectedCategoryId(categoryId);
     setMainView('categoryDetail');
-    fetchSummaries(categoryId);
+    // Ensure feeds are loaded before showing category detail
+    if (feeds.length === 0) {
+      fetchFeeds().then(() => {
+        fetchSummaries(categoryId);
+      });
+    } else {
+      fetchSummaries(categoryId);
+    }
   };
 
   const toggleCategory = (categoryId: number) => {
@@ -500,17 +496,15 @@ export default function Home() {
                       onMouseLeave={() => setFeedsStackHovered(false)}
                     >
                       {(() => {
-                        const shuffledFeeds = shuffleArray(categoryFeeds);
-                        return shuffledFeeds.map((feed, index) => {
-                          const rotation = feedsStackHovered ? 0 : getCardRotation(index, shuffledFeeds.length);
-                          const spreadOffset = feedsStackHovered ? 0 : (index === 0 ? 0 : -80 - index * 20);
+                        return categoryFeeds.map((feed, index) => {
+                          const rotation = feedsStackHovered ? 0 : getCardRotation(index, categoryFeeds.length);
                           return (
                             <div
                               key={feed.id}
                               className={styles.feedMiniCard}
                               style={{
                                 transform: `rotate(${rotation}deg) translateY(${feedsStackHovered ? 0 : `${-index * 8}px`})`,
-                                zIndex: shuffledFeeds.length - index,
+                                zIndex: categoryFeeds.length - index,
                                 marginLeft: index === 0 ? 0 : feedsStackHovered ? `${index * 30}px` : `${-100 - index * 30}px`,
                                 transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                               }}
