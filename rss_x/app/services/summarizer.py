@@ -23,23 +23,15 @@ def get_ai_config():
                 return {
                     'provider': settings.get('ai_provider', 'openai'),
                     'model': settings.get('ai_model', 'gpt-4o-mini'),
-                    'api_key': os.environ.get('AI_API_KEY_MINIMAX') or os.environ.get('AI_API_KEY') or settings.get('ai_api_key', ''),
-                    'base_url': os.environ.get('OPENAI_BASE_URL') or settings.get('ai_base_url', ''),
+                    'api_key': os.environ.get('xdaily_LLM_SUMMARIZER_APIKEY') or settings.get('ai_api_key', ''),
+                    'base_url': settings.get('ai_base_url', '') or os.environ.get('OPENAI_BASE_URL'),
                     'max_tokens': settings.get('ai_max_tokens', 1000),
                     'temperature': settings.get('ai_temperature', 0.7),
                     'extra_body': settings.get('ai_extra_body', {})
                 }
     except Exception as e:
         logger.warning(f"Failed to load AI config: {e}")
-    return {
-        'provider': 'openai',
-        'model': 'gpt-4o-mini',
-        'api_key': os.environ.get('AI_API_KEY_MINIMAX') or os.environ.get('AI_API_KEY', ''),
-        'base_url': os.environ.get('OPENAI_BASE_URL', ''),
-        'max_tokens': 1000,
-        'temperature': 0.7,
-        'extra_body': {}
-    }
+    return {}
 
 
 def build_summary_prompt(tweets: list) -> str:
@@ -59,7 +51,7 @@ def build_summary_prompt(tweets: list) -> str:
 
     tweets_text = '\n'.join(tweet_lines)
 
-    prompt = fprompt = f"""你是一个专业的社交媒体内容分析助手，擅长从碎片化推文中提炼高价值信息，并生成结构化日报。
+    prompt = fprompt = f"""你是一个专业的社交媒体内容分析助手，擅长从碎片化推文中提炼高价值信息，并生成中文的结构化日报。
 
 请基于以下推文生成一份“今日推文简报”。
 
@@ -95,6 +87,7 @@ def build_summary_prompt(tweets: list) -> str:
 - 语言简洁、有洞察
 - 保持专业感，像行业日报
 - 不要输出分析过程
+- 输出必须是中文
 
 开始输出：
 """
@@ -105,13 +98,13 @@ def call_ai_api(prompt: str) -> str:
     """Call AI API to generate summary."""
     config = get_ai_config()
 
-    if not config['api_key']:
+    if not config.get('api_key'):
         raise Exception("AI_API_KEY not configured")
 
-    if config['provider'] == 'openai':
+    if config.get('provider') == 'openai':
         return call_openai(prompt, config)
     else:
-        raise Exception(f"Unsupported AI provider: {config['provider']}")
+        raise Exception(f"Unsupported AI provider: {config.get('provider')}")
 
 
 def call_openai(prompt: str, config: dict) -> str:

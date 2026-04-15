@@ -508,6 +508,7 @@ export default function Home() {
                                 marginLeft: index === 0 ? 0 : feedsStackHovered ? `${index * 30}px` : `${-100 - index * 30}px`,
                                 transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                               }}
+                              onClick={() => window.open(`https://twitter.com/${feed.twitter_username}`, '_blank')}
                             >
                               <img
                                 src={feed.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(feed.name)}&background=6366f1&color=fff`}
